@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 3. **Jalankan Script**
 ```bash
-python igfilter.py
+python index.py
 ```
 
 | File                       | Isi                               |
