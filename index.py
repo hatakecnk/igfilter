@@ -1,3 +1,4 @@
+
 import os
 import json
 from bs4 import BeautifulSoup
@@ -13,12 +14,12 @@ init(autoreset=True)
 # Fungsi tampilkan banner
 def tampilkan_banner():
     print("""
-╭━━╮╭━━━╮   ╭━━━╮╱╱╭╮╱╱╭╮╱╱╱╱╱╱╱╱
-╰┫┣╯┃╭━╮┃   ┃╭━━╯╱╱┃┃╱╭╯╰╮╱╱╱╱╱╱╱
-╱┃┃╱┃┃╱╰╯   ┃╰━━╮╭╮┃┃╱╰╮╭╯╭━━╮╭━╮
-╱┃┃╱┃┃╭━╮   ┃╭━━╯┣┫┃┃╱╱┃┃╱┃┃━┫┃╭╯
-╭┫┣╮┃╰┻━┃   ┃┃╱╱╱┃┃┃╰╮╱┃╰╮┃┃━┫┃┃╱
-╰━━╯╰━━━╯   ╰╯╱╱╱╰╯╰━╯╱╰━╯╰━━╯╰╯╱
+╭━━╮╭━━━╮   ╭━━━╮╱╱╭╮╱╱╭╮
+╰┫┣╯┃╭━╮┃   ┃╭━━╯╱╱┃┃╱╭╯╰╮
+╱┃┃╱┃┃╱╰╯   ┃╰━━╮╭╮┃┃╱╰╮╭╯
+╱┃┃╱┃┃╭━╮   ┃╭━━╯┣┫┃┃╱╱┃┃
+╭┫┣╮┃╰┻━┃   ┃┃╱╱╱┃┃┃╰╮╱┃╰╮
+╰━━╯╰━━━╯   ╰╯╱╱╱╰╯╰━╯╱╰━╯
 Author      : Febry Afriansyah
 Email       : febryafriansyah@programmer.net
 Github      : github.com/hatakecnk
@@ -52,12 +53,22 @@ def ambil_usernames(file_path):
     elif ext == '.json':
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
+
+    # Jika data berupa dict dan punya key khusus (seperti 'relationships_following')
+        if isinstance(data, dict):
+            if "relationships_following" in data:
+                data = data["relationships_following"]
+            else:
+                data = list(data.values())[0] if data else []
+
         for entry in data:
-            try:
-                username = entry['string_list_data'][0]['value']
-                usernames.add(username)
-            except (KeyError, IndexError, TypeError):
-                continue
+            string_data = entry.get("string_list_data", [])
+            for item in string_data:
+                username = item.get("value")
+                if username:
+                    usernames.add(username)
+
+
 
     return usernames
 
@@ -68,9 +79,9 @@ tampilkan_banner()
 print(f"{Style.BRIGHT}📁 Program dijalankan dari folder: {os.getcwd()}\n")
 
 print("📂 Masukkan path ke file followers (HTML atau JSON)")
-print("👉 Contoh (file di folder ini): followers_1.html")
-print("👉 Contoh (full path): C:/Users/Kamu/Documents/following.json\n")
 followers_file = input_file("followers")
+
+print("\n📂 Masukkan path ke file following (HTML atau JSON)")
 following_file = input_file("following")
 
 clear_screen()
@@ -121,7 +132,7 @@ while True:
         print(Fore.GREEN + Style.BRIGHT + '🟢 Kamu Tidak Follow Balik (Dia follow kamu, kamu nggak follow dia)')
         print('='*70)
         if fans_kamu:
-            for idx, user in enumerate(sorted(tidak_follow_back), start=1):
+            for idx, user in enumerate(sorted(fans_kamu), start=1):
                 print(f"{Fore.BLUE}{idx}. {Fore.WHITE}{user}")
             print(Fore.GREEN + f"\nTotal: {len(fans_kamu)} akun\n")
         else:
@@ -132,3 +143,5 @@ while True:
         break
     else:
         print(Fore.YELLOW + "⚠️ Pilihan tidak valid. Silakan pilih 1, 2, atau 0.\n")
+
+    input("Tekan Enter untuk kembali ke menu...")
